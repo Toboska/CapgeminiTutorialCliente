@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { Category } from './model/category';
 import { CATEGORY_DATA } from './model/mock-categories';
+import { Category } from './model/category';
+//Clase que nos permite trabajar con datos asíncronos, datos que pueden tardar en llegar o cambiar con el tiempo
+import { Observable, of } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
