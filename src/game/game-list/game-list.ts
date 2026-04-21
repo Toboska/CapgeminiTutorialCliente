@@ -33,10 +33,10 @@ import { GameItem } from './game-item/game-item';
     styleUrl: './game-list.scss',
 })
 export class GameList implements OnInit {
-    categories: Category[];
-    games: Game[];
+    categories: Category[] = [];
+    games: Game[] = [];
     filterCategory: Category;
-    filterTitle: string;
+    filterTitle: string | null = null;
 
     constructor(
         private gameService: GameService,
