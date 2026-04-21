@@ -14,6 +14,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { GameItem } from './game-item/game-item';
+/*
+Al entrar a la página no se mostraba nada, por lo que he añadido esta biblioteca,
+que se encarga de detectar entre otros llegada de datos por HTTP
+*/
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
     selector: 'app-game-list',
@@ -41,15 +46,19 @@ export class GameList implements OnInit {
     constructor(
         private gameService: GameService,
         private categoryService: CategoryService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        private cd: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
-        this.gameService.getGames().subscribe((games) => (this.games = games));
-
         this.categoryService
             .getCategories()
-            .subscribe((categories) => (this.categories = categories));
+            .subscribe((categories) => {
+                this.categories = categories;
+                this.cd.detectChanges(); //En cuanto haya cmabios actualiza el HTML
+            });
+
+        this.onSearch();
     }
 
     onCleanFilter(): void {
@@ -65,7 +74,10 @@ export class GameList implements OnInit {
 
         this.gameService
             .getGames(title, categoryId)
-            .subscribe((games) => (this.games = games));
+            .subscribe((games) => {
+                this.games = games
+                this.cd.detectChanges();
+            });
     }
 
     createGame() {
