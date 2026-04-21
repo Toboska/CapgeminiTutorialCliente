@@ -1,4 +1,4 @@
-import { AuthorPage } from './model/AuthorPage';
+import { AuthorPage } from './AuthorPage';
 
 export const AUTHOR_DATA: AuthorPage = {
     content: [
