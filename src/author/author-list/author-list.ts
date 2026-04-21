@@ -12,92 +12,89 @@ import { Pageable } from '../../app/core/model/page/Pageable';
 import { DialogConfirmation } from '../../app/core/dialog-confirmation/dialog-confirmation';
 
 @Component({
-    selector: 'app-author-list',
-    standalone: true,
-    imports: [
-        CommonModule, 
-        MatButtonModule, 
-        MatIconModule, 
-        MatTableModule, 
-        MatPaginatorModule 
-    ],
-    templateUrl: './author-list.html', 
-    styleUrl: './author-list.scss',
+  selector: 'app-author-list',
+  standalone: true,
+  imports: [MatButtonModule, MatIconModule, MatTableModule, CommonModule, MatPaginatorModule],
+  templateUrl: './author-list.html',
+  styleUrl: './author-list.scss',
 })
 export class AuthorList implements OnInit {
-    pageNumber: number = 0;
-    pageSize: number = 5;
-    totalElements: number = 0;
+  pageNumber: number = 0;
+  pageSize: number = 5;
+  totalElements: number = 0;
 
-    dataSource = new MatTableDataSource<Author>();
-    displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
+  dataSource = new MatTableDataSource<Author>();
+  displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
 
-    constructor(private authorService: AuthorService, public dialog: MatDialog) {}
+  constructor(
+    private authorService: AuthorService,
+    public dialog: MatDialog,
+  ) {}
 
-    ngOnInit(): void {
-        this.loadPage();
+  ngOnInit(): void {
+    this.loadPage();
+  }
+
+  loadPage(event?: PageEvent) {
+    const pageable: Pageable = {
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize,
+      sort: [
+        {
+          property: 'id',
+          direction: 'ASC',
+        },
+      ],
+    };
+
+    if (event != null) {
+      pageable.pageSize = event.pageSize;
+      pageable.pageNumber = event.pageIndex;
     }
 
-    loadPage(event?: PageEvent) {
-        const pageable: Pageable = {
-            pageNumber: this.pageNumber,
-            pageSize: this.pageSize,
-            sort: [
-                {
-                    property: 'id',
-                    direction: 'ASC',
-                },
-            ],
-        };
+    this.authorService.getAuthors(pageable).subscribe((data) => {
+      this.dataSource.data = data.content;
+      this.pageNumber = data.pageable.pageNumber;
+      this.pageSize = data.pageable.pageSize;
+      this.totalElements = data.totalElements;
+    });
+  }
 
-        if (event != null) {
-            pageable.pageSize = event.pageSize;
-            pageable.pageNumber = event.pageIndex;
-        }
+  createAuthor() {
+    const dialogRef = this.dialog.open(AuthorEdit, {
+      data: {},
+    });
 
-        this.authorService.getAuthors(pageable).subscribe((data) => {
-            this.dataSource.data = data.content;
-            this.pageNumber = data.pageable.pageNumber;
-            this.pageSize = data.pageable.pageSize;
-            this.totalElements = data.totalElements;
+    dialogRef.afterClosed().subscribe((result) => {
+      this.ngOnInit();
+    });
+  }
+
+  editAuthor(author: Author) {
+    const dialogRef = this.dialog.open(AuthorEdit, {
+      data: { author: author },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.ngOnInit();
+    });
+  }
+
+  deleteAuthor(author: Author) {
+    const dialogRef = this.dialog.open(DialogConfirmation, {
+      data: {
+        title: 'Eliminar autor',
+        description:
+          'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.authorService.deleteAuthor(author.id).subscribe((result) => {
+          this.ngOnInit();
         });
-    }
-
-    createAuthor() {
-        const dialogRef = this.dialog.open(AuthorEdit, {
-            data: {},
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) this.loadPage();
-        });
-    }
-
-    editAuthor(author: Author) {
-        const dialogRef = this.dialog.open(AuthorEdit, {
-            data: { author: author },
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) this.loadPage();
-        });
-    }
-
-    deleteAuthor(author: Author) {
-        const dialogRef = this.dialog.open(DialogConfirmation, {
-            data: {
-                title: 'Eliminar autor',
-                description:
-                    'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
-            },
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.authorService.deleteAuthor(author.id).subscribe(() => {
-                    this.loadPage();
-                });
-            }
-        });
-    }
+      }
+    });
+  }
 }
