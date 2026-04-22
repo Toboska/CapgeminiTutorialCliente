@@ -49,12 +49,12 @@ export class ClientList implements OnInit{
     );
   }
 
-  createClient(Client: Client){
+  createClient(){
     //this.dialog.open llama al componente para que lo dibuje por encima
     const dialogRef = this.dialog.open(ClientEdit, {data: {}});
   
     //Como hemos guardado el objeto en dialogRef, podemos monitorizar el estado del edit
-    dialogRef.afterClosed().subscribe(result => this.ngOnInit());
+    dialogRef.afterClosed().subscribe(result => {this.ngOnInit()});
   }
 
   editClient(client: Client){
