@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ClientService } from '../client';
 import { MatDialog } from '@angular/material/dialog';
 import { ClientEdit } from '../client-edit/client-edit';
-import { DialogConfirmation } from '../../app/core/dialog-confirmation/dialog-confirmation';
+import { DialogConfirmation } from '../../core/dialog-confirmation/dialog-confirmation';
 import { CategoryEdit } from '../../category/category-edit/category-edit';
 
 //El .ts se encarga de definit la lógica, comportamiento, y se conecta con su html y estilos(scss)

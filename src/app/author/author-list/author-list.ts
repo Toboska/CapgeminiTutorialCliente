@@ -8,8 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthorEdit } from '../author-edit/author-edit';
 import { AuthorService } from '../author';
 import { Author } from '../model/Author';
-import { Pageable } from '../../app/core/model/page/Pageable';
-import { DialogConfirmation } from '../../app/core/dialog-confirmation/dialog-confirmation';
+import { Pageable } from '../../core/model/page/Pageable';
+import { DialogConfirmation } from '../../core/dialog-confirmation/dialog-confirmation';
 
 @Component({
   selector: 'app-author-list',

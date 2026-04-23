@@ -1,4 +1,4 @@
-import { Pageable } from '../../app/core/model/page/Pageable';
+import { Pageable } from '../../core/model/page/Pageable';
 import { Author } from "./Author";
 
 export class AuthorPage {

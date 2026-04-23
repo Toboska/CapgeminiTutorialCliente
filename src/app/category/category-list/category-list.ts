@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CategoryService } from '../category';
 import { MatDialog } from '@angular/material/dialog';
 import { CategoryEdit } from '../category-edit/category-edit';
-import { DialogConfirmation } from '../../app/core/dialog-confirmation/dialog-confirmation';
+import { DialogConfirmation } from '../../core/dialog-confirmation/dialog-confirmation';
 
 
 @Component({
