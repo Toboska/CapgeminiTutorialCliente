@@ -32,10 +32,10 @@ export class ClientEdit implements OnInit{
   }
 
   onSave() {
-      this.clientService.saveClient(this.client).subscribe(() => {
-      this.dialogRef.close();
-      });
-    }
+    this.clientService.saveClient(this.client).subscribe(() => {
+    this.dialogRef.close();
+    });
+  }
     
   onClose() {
     this.dialogRef.close();

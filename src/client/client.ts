@@ -23,7 +23,7 @@ export class ClientService {
   saveClient(client: Client): Observable<Client> {
     const { id } = client;
     const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
-    return this.http.put<Client>(url, Client);
+    return this.http.put<Client>(url, client);
   }
 
   deleteClient(idClient : number): Observable<any> {
