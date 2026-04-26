@@ -29,6 +29,23 @@
             </mat-select>
         </mat-form-field>
 
+        <mat-form-field appearance="fill">
+            <mat-label>Fechas de préstamo</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate 
+                       placeholder="Desde" 
+                       [(ngModel)]="prestamo.fechaPrestamo" 
+                       name="fechaPrestamo">
+                <input matEndDate 
+                       placeholder="Hasta" 
+                       [(ngModel)]="prestamo.fechaDevolucion" 
+                       name="fechaDevolucion">
+            </mat-date-range-input>
+            
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+
     </form>
 
     <div class="buttons">

@@ -7,6 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 //Clases para poder mostrar los datos correctamente
 import { Client } from '../../client/model/Client';
 import { Game } from '../../game/model/Game';
@@ -18,7 +20,15 @@ import { GameService } from '../../game/game';
 @Component({
   selector: 'app-prestamo-edit',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSelectModule ],
+  imports: [FormsModule, 
+    ReactiveFormsModule, 
+    MatFormFieldModule, 
+    MatInputModule, 
+    MatButtonModule, 
+    MatSelectModule, 
+    MatNativeDateModule,
+    MatDatepickerModule 
+  ],
   templateUrl: './prestamo-edit.html',
   styleUrl: './prestamo-edit.scss',
 })
