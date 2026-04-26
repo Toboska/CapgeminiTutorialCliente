@@ -1,98 +1,100 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
+import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { PrestamoEdit } from '../prestamo-edit/prestamo-edit';
 import { PrestamoService } from '../prestamo';
 import { Prestamo } from '../model/Prestamo';
-import { CategoryService } from '../../category/category';
-import { Category } from '../../category/model/category';
-import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-/*Al entrar a la página no se mostraba nada, por lo que he añadido esta biblioteca,
-que se encarga de detectar entre otros llegada de datos por HTTP*/
-import { ChangeDetectorRef } from '@angular/core';
+import { Pageable } from '../../core/model/page/Pageable';
+import { DialogConfirmation } from '../../core/dialog-confirmation/dialog-confirmation';
 
 @Component({
-    selector: 'app-prestamo-list',
-    standalone: true,
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatTableModule,
-        CommonModule,
-        FormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-    ],
-    templateUrl: './prestamo-list.html',
-    styleUrl: './prestamo-list.scss',
+  selector: 'app-prestamo-list',
+  standalone: true,
+  imports: [MatButtonModule, MatIconModule, MatTableModule, CommonModule, MatPaginatorModule],
+  templateUrl: './prestamo-list.html',
+  styleUrl: './prestamo-list.scss',
 })
 export class PrestamoList implements OnInit {
-    categories: Category[] = [];
-    prestamos: Prestamo[] = [];
-    filterCategory: Category;
-    filterTitle: string | null = null;
+  pageNumber: number = 0;
+  pageSize: number = 5;
+  totalElements: number = 0;
 
-    constructor(
-        private prestamoService: PrestamoService,
-        private categoryService: CategoryService,
-        public dialog: MatDialog,
-        private cd: ChangeDetectorRef
-    ) {}
+  dataSource = new MatTableDataSource<Prestamo>();
+  displayedColumns: string[] = ['id', 'gameTitle', 'clientName', 'fechaPrestamo', 'fechaDevolucion','action'];
 
-    ngOnInit(): void {
-        this.categoryService
-            .getCategories()
-            .subscribe((categories) => {
-                this.categories = categories;
-                this.cd.detectChanges(); //En cuanto haya cambios actualiza el HTML
-            });
+  constructor(
+    private prestamoService: PrestamoService,
+    public dialog: MatDialog,
+  ) {}
 
-        this.onSearch();
+  ngOnInit(): void {
+    this.loadPage();
+  }
+
+  loadPage(event?: PageEvent) {
+    const pageable: Pageable = {
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize,
+      sort: [
+        {
+          property: 'id',
+          direction: 'ASC',
+        },
+      ],
+    };
+
+    if (event != null) {
+      pageable.pageSize = event.pageSize;
+      pageable.pageNumber = event.pageIndex;
     }
 
-    onCleanFilter(): void {
-        this.filterTitle = null;
-        this.filterCategory = null;
-        this.onSearch();
-    }
+    this.prestamoService.getPrestamos(pageable).subscribe((data) => {
+      this.dataSource.data = data.content;
+      this.pageNumber = data.pageable.pageNumber;
+      this.pageSize = data.pageable.pageSize;
+      this.totalElements = data.totalElements;
+    });
+  }
 
-    onSearch(): void {
-        const title = this.filterTitle;
-        const categoryId =
-            this.filterCategory != null ? this.filterCategory.id : null;
+  createPrestamo() {
+    const dialogRef = this.dialog.open(PrestamoEdit, {
+      data: {},
+    });
 
-        this.prestamoService
-            .getPrestamos(title, categoryId)
-            .subscribe((prestamos) => {
-                this.prestamos = prestamos
-                this.cd.detectChanges();
-            });
-    }
+    dialogRef.afterClosed().subscribe((result) => {
+      this.ngOnInit();
+    });
+  }
 
-    createPrestamo() {
-        const dialogRef = this.dialog.open(PrestamoEdit, {
-            data: {},
+  editPrestamo(prestamo: Prestamo) {
+    const dialogRef = this.dialog.open(PrestamoEdit, {
+      data: { prestamo: prestamo },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.ngOnInit();
+    });
+  }
+
+  deletePrestamo(prestamo: Prestamo) {
+    const dialogRef = this.dialog.open(DialogConfirmation, {
+      data: {
+        title: 'Eliminar autor',
+        description:
+          'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.prestamoService.deletePrestamo(prestamo.id).subscribe((result) => {
+          this.ngOnInit();
         });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            this.ngOnInit();
-        });
-    }
-
-    editPrestamo(prestamo: Prestamo) {
-        const dialogRef = this.dialog.open(PrestamoEdit, {
-            data: { prestamo: prestamo },
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            this.onSearch();
-        });
-    }
+      }
+    });
+  }
 }

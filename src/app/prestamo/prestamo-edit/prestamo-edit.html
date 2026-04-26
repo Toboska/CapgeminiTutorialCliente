@@ -1,8 +1,8 @@
 <div class="container">
     @if (prestamo.id) {
-        <h1>Modificar cliente</h1>
+        <h1>Modificar el préstamo</h1>
     } @else {
-        <h1>Dar de alta</h1>
+        <h1>Crear Préstamo</h1>
     }
 
     <form>
@@ -12,10 +12,23 @@
         </mat-form-field>
 
         <mat-form-field>
-            <mat-label>Nombre</mat-label>
-            <input type="text" matInput placeholder="Nombre de categoría" [(ngModel)]="prestamo.id" name="name" required>
-            <mat-error>El nombre no puede estar vacío</mat-error>
+            <mat-label>Cliente</mat-label>
+            <mat-select disableRipple [(ngModel)]="prestamo.client" name="clientName" required>
+                @for (client of clients; track client.id) {
+                    <mat-option [value]="client">{{client.name}}</mat-option>
+                }
+            </mat-select>
         </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Juego</mat-label>
+            <mat-select disableRipple [(ngModel)]="prestamo.game" name="gameTitle" required>
+                @for (game of games; track game.id) {
+                    <mat-option [value]="game">{{game.title}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
     </form>
 
     <div class="buttons">

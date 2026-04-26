@@ -1,38 +1,33 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { Pageable } from '../core/model/page/Pageable';
 import { Prestamo } from './model/Prestamo';
+import { PrestamoPage } from "./model/PrestamoPage";
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class PrestamoService {
-    constructor(
-        private http: HttpClient
-    ) {}
+    constructor(private http: HttpClient) {}
 
     private baseUrl = 'http://localhost:8080/prestamo';
 
-    getPrestamos(title?: string, categoryId?: number): Observable<Prestamo[]> {
-        return this.http.get<Prestamo[]>(this.composeFindUrl(title, categoryId));
+    getPrestamos(pageable: Pageable): Observable<PrestamoPage> {
+        return this.http.post<PrestamoPage>(this.baseUrl, { pageable: pageable });
     }
 
-    savePrestamo(prestamo: Prestamo): Observable<void> {
+    savePrestamo(prestamo: Prestamo): Observable<Prestamo> {
         const { id } = prestamo;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
-
-        return this.http.put<void>(url, prestamo);
+        return this.http.put<Prestamo>(url, prestamo);
     }
 
-    private composeFindUrl(title?: string, categoryId?: number): string {
-        const params = new URLSearchParams();
-        if (title) {
-          params.set('title', title);
-        }  
-        if (categoryId) {
-            params.set('idCategory', categoryId.toString());
-        }
-        const queryString = params.toString();
-        return queryString ? `${this.baseUrl}?${queryString}` : this.baseUrl;
+    deletePrestamo(idPrestamo: number): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${idPrestamo}`);
+    }
+
+    getAllPrestamos(): Observable<Prestamo[]> {
+        return this.http.get<Prestamo[]>(this.baseUrl);
     }
 }
