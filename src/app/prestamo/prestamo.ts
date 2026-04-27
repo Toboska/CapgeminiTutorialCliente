@@ -28,7 +28,7 @@ export class PrestamoService {
             this.composeFindUrlPrestamo(gameId, clientId, date),
             { params }
         );
-        }
+    }
 
     private composeFindUrlPrestamo(gameId?: number, clientId?: number, date?: Date): string {
         const params = new URLSearchParams();
@@ -48,9 +48,11 @@ export class PrestamoService {
     }
 
     savePrestamo(prestamo: Prestamo): Observable<Prestamo> {
+        console.log(prestamo);
         const { id } = prestamo;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
         return this.http.put<Prestamo>(url, prestamo);
+        ("")
     }
 
     deletePrestamo(idPrestamo: number): Observable<void> {
