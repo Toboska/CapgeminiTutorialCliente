@@ -31,29 +31,57 @@
             <mat-error>El Juego no puede estar vacío</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-            <mat-label>Fechas de préstamo</mat-label>
-            <mat-date-range-input [rangePicker]="picker">
-                <input matStartDate 
-                    placeholder="Desde" 
-                    [(ngModel)]="prestamo.fechaPrestamo" 
-                    name="fechaPrestamo"
-                    required
-                    #fechaInicio="ngModel"> <input matEndDate 
-                    placeholder="Hasta" 
-                    [(ngModel)]="prestamo.fechaDevolucion" 
-                    name="fechaDevolucion"
-                    required
-                    #fechaFin="ngModel"> </mat-date-range-input>
+        <div class="date-container">
 
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
+            <!-- FECHA DE PRÉSTAMO -->
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha de préstamo</mat-label>
+                <input
+                matInput
+                [matDatepicker]="fechaPrestamoPicker"
+                [(ngModel)]="prestamo.fechaPrestamo"
+                (dateChange)="onPrestamoDateChange($event.value)"
+                name="fechaPrestamo"
+                required
+                #fechaInicio="ngModel"
+                />
+                <mat-datepicker-toggle matSuffix [for]="fechaPrestamoPicker"></mat-datepicker-toggle>
+                <mat-datepicker #fechaPrestamoPicker></mat-datepicker>
+
+                <mat-error *ngIf="fechaInicio.hasError('required')">
+                La fecha de préstamo es obligatoria
+                </mat-error>
+            </mat-form-field>
+
+            <!-- FECHA DE DEVOLUCIÓN -->
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha de devolución</mat-label>
+                <input
+                matInput
+                [matDatepicker]="fechaDevolucionPicker"
+                [(ngModel)]="prestamo.fechaDevolucion"
+                (dateChange)="onReturnDateChange($event.value)"
+                [min]="prestamo.fechaPrestamo"
+                name="fechaDevolucion"
+                required
+                #fechaFin="ngModel"
                 
-            <mat-error *ngIf="fechaInicio.hasError('required') || fechaFin.hasError('required')">
-            </mat-error>
-            <mat-error *ngIf="prestamo.fechaDevolucion && !validateRange()">
-            </mat-error>
-        </mat-form-field>
+
+
+                />
+                <mat-datepicker-toggle matSuffix [for]="fechaDevolucionPicker"></mat-datepicker-toggle>
+                <mat-datepicker #fechaDevolucionPicker></mat-datepicker>
+
+                <mat-error *ngIf="fechaFin.hasError('required')">
+                La fecha de devolución es obligatoria
+                </mat-error>
+
+                <mat-error *ngIf="prestamo.fechaDevolucion && !validateRange()">
+                La fecha de devolución debe ser posterior a la de préstamo
+                </mat-error>
+            </mat-form-field>
+
+            </div>
 
     </form>
 

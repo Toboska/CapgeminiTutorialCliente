@@ -1,66 +1,93 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { Pageable } from '../core/model/page/Pageable';
-import { Prestamo } from './model/Prestamo';
-import { PrestamoPage } from "./model/PrestamoPage";
+import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
+import { Pageable } from '../core/model/page/Pageable';
+import { Prestamo } from './model/Prestamo';
+import { PrestamoPage } from './model/PrestamoPage';
+
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class PrestamoService {
-    constructor(private http: HttpClient) {}
 
-    private baseUrl = 'http://localhost:8080/prestamo';
+  private baseUrl = 'http://localhost:8080/prestamo';
 
-    getPrestamos(
-        pageable: Pageable,
-        gameId?: number,
-        clientId?: number,
-        date?: Date
-        ): Observable<PrestamoPage> {
+  constructor(private http: HttpClient) {}
 
-        let params = new HttpParams()
-            .set('page', pageable.pageNumber.toString())
-            .set('size', pageable.pageSize.toString());
+  getPrestamos(
+    pageable: Pageable,
+    gameId?: number | null,
+    clientId?: number | null,
+    date?: Date | null
+  ): Observable<PrestamoPage> {
 
-        return this.http.get<PrestamoPage>(
-            this.composeFindUrlPrestamo(gameId, clientId, date),
-            { params }
-        );
+    let params = new HttpParams()
+      .set('page', pageable.pageNumber.toString())
+      .set('size', pageable.pageSize.toString());
+
+    if (date != null) {
+      params = params.set('date', this.toLocalDateString(date));
     }
 
-    private composeFindUrlPrestamo(gameId?: number, clientId?: number, date?: Date): string {
-        const params = new URLSearchParams();
+    return this.http.get<PrestamoPage>(
+      this.composeFindUrlPrestamo(gameId, clientId),
+      { params }
+    );
+  }
 
-        if(gameId){
-            params.set('gameId', gameId.toString());
-        }
-        if(clientId){
-            params.set('clientId', clientId.toString());
-        }
-        if(date){
-            const formattedDate = date.toISOString().split('T')[0];
-            params.set('date', formattedDate);
-        }
-        const queryString = params.toString();
-        return queryString ? `${this.baseUrl}?${queryString}` : this.baseUrl;
+  savePrestamo(prestamo: Prestamo): Observable<Prestamo> {
+    const url = prestamo.id
+      ? `${this.baseUrl}/${prestamo.id}`
+      : this.baseUrl;
+
+    return this.http.put<Prestamo>(url, prestamo);
+  }
+
+  deletePrestamo(idPrestamo: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${idPrestamo}`);
+  }
+
+  getAllPrestamos(): Observable<Prestamo[]> {
+    return this.http.get<Prestamo[]>(this.baseUrl);
+  }
+
+  // ------------------------
+  // MÉTODOS PRIVADOS
+  // ------------------------
+
+  /**
+   * Convierte Date de JS a string local yyyy-MM-dd
+   * (SIN UTC, SIN timezone, SIN desfases)
+   */
+  private toLocalDateString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Construye la URL SOLO con IDs simples
+   * NUNCA meter fechas aquí
+   */
+  private composeFindUrlPrestamo(
+    gameId?: number | null,
+    clientId?: number | null
+  ): string {
+
+    const params: string[] = [];
+
+    if (gameId != null) {
+      params.push(`gameId=${gameId}`);
     }
 
-    savePrestamo(prestamo: Prestamo): Observable<Prestamo> {
-        console.log(prestamo);
-        const { id } = prestamo;
-        const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
-        return this.http.put<Prestamo>(url, prestamo);
-        ("")
+    if (clientId != null) {
+      params.push(`clientId=${clientId}`);
     }
 
-    deletePrestamo(idPrestamo: number): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${idPrestamo}`);
-    }
-
-    getAllPrestamos(): Observable<Prestamo[]> {
-        return this.http.get<Prestamo[]>(this.baseUrl);
-    }
-
+    return params.length > 0
+      ? `${this.baseUrl}?${params.join('&')}`
+      : this.baseUrl;
+  }
 }

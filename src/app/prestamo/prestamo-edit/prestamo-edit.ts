@@ -35,7 +35,7 @@ import { GameService } from '../../game/game';
 })
 
 export class PrestamoEdit implements OnInit {
-  prestamo: Prestamo;
+  prestamo: Prestamo | null;
   clients: Client[];
   games: Game[];
 
@@ -80,6 +80,25 @@ export class PrestamoEdit implements OnInit {
       }
     });
 
+  }
+
+  onPrestamoDateChange(date: Date | null) {
+    if (date) {
+      this.prestamo.fechaPrestamo = this.toLocalDateString(date);
+    }
+  }
+  
+  onReturnDateChange(date: Date | null) {
+    if (date) {
+      this.prestamo.fechaDevolucion = this.toLocalDateString(date);
+    }
+  }
+  
+  private toLocalDateString(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   onSave() {
