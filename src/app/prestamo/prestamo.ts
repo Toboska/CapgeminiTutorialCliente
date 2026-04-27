@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { Pageable } from '../core/model/page/Pageable';
 import { Prestamo } from './model/Prestamo';
 import { PrestamoPage } from "./model/PrestamoPage";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root',
@@ -13,27 +13,36 @@ export class PrestamoService {
 
     private baseUrl = 'http://localhost:8080/prestamo';
 
-    getPrestamos(pageable: Pageable, gameId?: number, clientId?: number, date?: Date): Observable<PrestamoPage> {
-        
-        const url = this.composeFindUrl(gameId, clientId, date);
-        
-        return this.http.post<PrestamoPage>(url, { pageable: pageable });
-    }
+    getPrestamos(
+        pageable: Pageable,
+        gameId?: number,
+        clientId?: number,
+        date?: Date
+        ): Observable<PrestamoPage> {
 
-    private composeFindUrl(gameId?: number, clientId?: number, date?: Date): string {
+        let params = new HttpParams()
+            .set('page', pageable.pageNumber.toString())
+            .set('size', pageable.pageSize.toString());
+
+        return this.http.get<PrestamoPage>(
+            this.composeFindUrlPrestamo(gameId, clientId, date),
+            { params }
+        );
+        }
+
+    private composeFindUrlPrestamo(gameId?: number, clientId?: number, date?: Date): string {
         const params = new URLSearchParams();
 
-        if (gameId) {
+        if(gameId){
             params.set('gameId', gameId.toString());
         }
-        if (clientId) {
+        if(clientId){
             params.set('clientId', clientId.toString());
         }
-        if (date) {
+        if(date){
             const formattedDate = date.toISOString().split('T')[0];
             params.set('date', formattedDate);
         }
-
         const queryString = params.toString();
         return queryString ? `${this.baseUrl}?${queryString}` : this.baseUrl;
     }
