@@ -18,6 +18,7 @@
                     <mat-option [value]="client">{{client.name}}</mat-option>
                 }
             </mat-select>
+            <mat-error>El Cliente no puede estar vacío</mat-error>
         </mat-form-field>
 
         <mat-form-field>
@@ -27,23 +28,31 @@
                     <mat-option [value]="game">{{game.title}}</mat-option>
                 }
             </mat-select>
+            <mat-error>El Juego no puede estar vacío</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
             <mat-label>Fechas de préstamo</mat-label>
             <mat-date-range-input [rangePicker]="picker">
                 <input matStartDate 
-                       placeholder="Desde" 
-                       [(ngModel)]="prestamo.fechaPrestamo" 
-                       name="fechaPrestamo">
-                <input matEndDate 
-                       placeholder="Hasta" 
-                       [(ngModel)]="prestamo.fechaDevolucion" 
-                       name="fechaDevolucion">
-            </mat-date-range-input>
-            
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    placeholder="Desde" 
+                    [(ngModel)]="prestamo.fechaPrestamo" 
+                    name="fechaPrestamo"
+                    required
+                    #fechaInicio="ngModel"> <input matEndDate 
+                    placeholder="Hasta" 
+                    [(ngModel)]="prestamo.fechaDevolucion" 
+                    name="fechaDevolucion"
+                    required
+                    #fechaFin="ngModel"> </mat-date-range-input>
+
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-date-range-picker #picker></mat-date-range-picker>
+                
+            <mat-error *ngIf="fechaInicio.hasError('required') || fechaFin.hasError('required')">
+            </mat-error>
+            <mat-error *ngIf="prestamo.fechaDevolucion && !validateRange()">
+            </mat-error>
         </mat-form-field>
 
     </form>

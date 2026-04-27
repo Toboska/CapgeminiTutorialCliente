@@ -27,7 +27,8 @@ import { GameService } from '../../game/game';
     MatButtonModule, 
     MatSelectModule, 
     MatNativeDateModule,
-    MatDatepickerModule 
+    MatDatepickerModule,
+    
   ],
   templateUrl: './prestamo-edit.html',
   styleUrl: './prestamo-edit.scss',
@@ -82,9 +83,28 @@ export class PrestamoEdit implements OnInit {
   }
 
   onSave() {
+
+    if (!this.validateRange()) {
+        alert("El periodo de préstamo no puede superar los 14 días.");
+        return;
+    }
+
     this.prestamoService.savePrestamo(this.prestamo).subscribe(() => {
       this.dialogRef.close();
     });
+  }
+
+  validateRange(): boolean {
+    if (this.prestamo.fechaPrestamo && this.prestamo.fechaDevolucion) {
+        const start = new Date(this.prestamo.fechaPrestamo);
+        const end = new Date(this.prestamo.fechaDevolucion);
+
+        const diffInMs = end.getTime() - start.getTime();
+        const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+        return diffInDays >= 0 && diffInDays <= 14;
+    }
+    return false;
   }
     
   onClose() {

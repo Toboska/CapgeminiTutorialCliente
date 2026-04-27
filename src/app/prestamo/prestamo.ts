@@ -13,8 +13,29 @@ export class PrestamoService {
 
     private baseUrl = 'http://localhost:8080/prestamo';
 
-    getPrestamos(pageable: Pageable): Observable<PrestamoPage> {
-        return this.http.post<PrestamoPage>(this.baseUrl, { pageable: pageable });
+    getPrestamos(pageable: Pageable, gameId?: number, clientId?: number, date?: Date): Observable<PrestamoPage> {
+        
+        const url = this.composeFindUrl(gameId, clientId, date);
+        
+        return this.http.post<PrestamoPage>(url, { pageable: pageable });
+    }
+
+    private composeFindUrl(gameId?: number, clientId?: number, date?: Date): string {
+        const params = new URLSearchParams();
+
+        if (gameId) {
+            params.set('gameId', gameId.toString());
+        }
+        if (clientId) {
+            params.set('clientId', clientId.toString());
+        }
+        if (date) {
+            const formattedDate = date.toISOString().split('T')[0];
+            params.set('date', formattedDate);
+        }
+
+        const queryString = params.toString();
+        return queryString ? `${this.baseUrl}?${queryString}` : this.baseUrl;
     }
 
     savePrestamo(prestamo: Prestamo): Observable<Prestamo> {
@@ -30,4 +51,5 @@ export class PrestamoService {
     getAllPrestamos(): Observable<Prestamo[]> {
         return this.http.get<Prestamo[]>(this.baseUrl);
     }
+
 }

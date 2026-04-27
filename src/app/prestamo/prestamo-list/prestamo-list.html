@@ -1,5 +1,45 @@
 <div class="container">
-    <h1>Listado de Autores</h1>
+    <h1>Listado de Préstamos</h1>
+
+    <div class="filtersPrestamo">
+        <form>
+
+            <mat-form-field>
+                <mat-label>Título del juego</mat-label>
+                <mat-select disableRipple [(ngModel)]="filterGame" name="category">
+                    @for (game of games; track game.id) {
+                        <mat-option [value]="game">{{ game.title }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Cliente</mat-label>
+                <mat-select disableRipple [(ngModel)]="filterClient" name="category">
+                    @for (client of clients; track client.id) {
+                        <mat-option [value]="client">{{ client.name }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha</mat-label>
+                <input matInput 
+                    [matDatepicker]="picker" 
+                    [(ngModel)]="filterDate" 
+                    name="date">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+        </form>
+        
+        <div class="buttons">
+            <button mat-stroked-button (click)="onCleanFilter()">Limpiar</button>
+            <button mat-stroked-button (click)="onSearch()">Filtrar</button>
+        </div>
+        
+    </div>
 
     <mat-table [dataSource]="dataSource"> 
         <ng-container matColumnDef="id">
@@ -47,6 +87,6 @@
     <mat-paginator (page)="loadPage($event)" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageNumber" [pageSize]="pageSize" [length]="totalElements" showFirstLastButtons></mat-paginator>
 
     <div class="buttons">
-        <button mat-flat-button color="primary" (click)="createPrestamo()">Nuevo autor</button> 
+        <button mat-flat-button color="primary" (click)="createPrestamo()">Crear préstamo</button> 
     </div>   
 </div>
