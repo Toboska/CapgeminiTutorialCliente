@@ -1,5 +1,5 @@
 <div class="container">
-    @if (prestamo.id) {
+    @if (loan.id) {
         <h1>Modificar el préstamo</h1>
     } @else {
         <h1>Crear Préstamo</h1>
@@ -8,12 +8,12 @@
     <form>
         <mat-form-field>
             <mat-label>Identificador</mat-label>
-            <input type="text" matInput placeholder="Identificador" [(ngModel)]="prestamo.id" name="id" disabled>
+            <input type="text" matInput placeholder="Identificador" [(ngModel)]="loan.id" name="id" disabled>
         </mat-form-field>
 
         <mat-form-field>
             <mat-label>Cliente</mat-label>
-            <mat-select disableRipple [(ngModel)]="prestamo.client" name="clientName" required>
+            <mat-select disableRipple [(ngModel)]="loan.client" name="clientName" required>
                 @for (client of clients; track client.id) {
                     <mat-option [value]="client">{{client.name}}</mat-option>
                 }
@@ -23,7 +23,7 @@
 
         <mat-form-field>
             <mat-label>Juego</mat-label>
-            <mat-select disableRipple [(ngModel)]="prestamo.game" name="gameTitle" required>
+            <mat-select disableRipple [(ngModel)]="loan.game" name="gameTitle" required>
                 @for (game of games; track game.id) {
                     <mat-option [value]="game">{{game.title}}</mat-option>
                 }
@@ -35,22 +35,14 @@
 
             <!-- FECHA DE PRÉSTAMO -->
             <mat-form-field appearance="fill">
-                <mat-label>Fecha de préstamo</mat-label>
-                <input
-                matInput
-                [matDatepicker]="fechaPrestamoPicker"
-                [(ngModel)]="prestamo.fechaPrestamo"
-                (dateChange)="onPrestamoDateChange($event.value)"
-                name="fechaPrestamo"
-                required
-                #fechaInicio="ngModel"
-                />
-                <mat-datepicker-toggle matSuffix [for]="fechaPrestamoPicker"></mat-datepicker-toggle>
-                <mat-datepicker #fechaPrestamoPicker></mat-datepicker>
-
-                <mat-error *ngIf="fechaInicio.hasError('required')">
-                La fecha de préstamo es obligatoria
-                </mat-error>
+                <mat-label>Fecha de inicio</mat-label>
+                <input matInput 
+                    [matDatepicker]="picker" 
+                    [(ngModel)]="loan.loanStartDate" 
+                    name="loanStartDate"
+                    required>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
 
             <!-- FECHA DE DEVOLUCIÓN -->
@@ -58,25 +50,24 @@
                 <mat-label>Fecha de devolución</mat-label>
                 <input
                 matInput
-                [matDatepicker]="fechaDevolucionPicker"
-                [(ngModel)]="prestamo.fechaDevolucion"
-                (dateChange)="onReturnDateChange($event.value)"
-                [min]="prestamo.fechaPrestamo"
-                name="fechaDevolucion"
+                [matDatepicker]="loanEndDatePicker"
+                [(ngModel)]="loan.loanEndDate"
+                [min]="loan.loanStartDate"
+                name="loanEndDate"
                 required
                 #fechaFin="ngModel"
                 
 
 
                 />
-                <mat-datepicker-toggle matSuffix [for]="fechaDevolucionPicker"></mat-datepicker-toggle>
-                <mat-datepicker #fechaDevolucionPicker></mat-datepicker>
+                <mat-datepicker-toggle matSuffix [for]="loanEndDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #loanEndDatePicker></mat-datepicker>
 
                 <mat-error *ngIf="fechaFin.hasError('required')">
                 La fecha de devolución es obligatoria
                 </mat-error>
 
-                <mat-error *ngIf="prestamo.fechaDevolucion && !validateRange()">
+                <mat-error *ngIf="loan.loanEndDate && !validateRange()">
                 La fecha de devolución debe ser posterior a la de préstamo
                 </mat-error>
             </mat-form-field>

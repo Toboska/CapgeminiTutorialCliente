@@ -3,24 +3,24 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Pageable } from '../core/model/page/Pageable';
-import { Prestamo } from './model/Prestamo';
-import { PrestamoPage } from './model/PrestamoPage';
+import { Loan } from './model/Loan';
+import { LoanPage } from './model/LoanPage';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PrestamoService {
+export class LoanService {
 
-  private baseUrl = 'http://localhost:8080/prestamo';
+  private baseUrl = 'http://localhost:8080/loan';
 
   constructor(private http: HttpClient) {}
 
-  getPrestamos(
+  getLoans(
     pageable: Pageable,
     gameId?: number | null,
     clientId?: number | null,
     date?: Date | null
-  ): Observable<PrestamoPage> {
+  ): Observable<LoanPage> {
 
     let params = new HttpParams()
       .set('page', pageable.pageNumber.toString())
@@ -30,26 +30,26 @@ export class PrestamoService {
       params = params.set('date', this.toLocalDateString(date));
     }
 
-    return this.http.get<PrestamoPage>(
-      this.composeFindUrlPrestamo(gameId, clientId),
+    return this.http.get<LoanPage>(
+      this.composeFindUrlLoan(gameId, clientId),
       { params }
     );
   }
 
-  savePrestamo(prestamo: Prestamo): Observable<Prestamo> {
-    const url = prestamo.id
-      ? `${this.baseUrl}/${prestamo.id}`
+  saveLoan(loan: Loan): Observable<Loan> {
+    const url = loan.id
+      ? `${this.baseUrl}/${loan.id}`
       : this.baseUrl;
 
-    return this.http.put<Prestamo>(url, prestamo);
+    return this.http.put<Loan>(url, loan);
   }
 
-  deletePrestamo(idPrestamo: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${idPrestamo}`);
+  deleteLoan(idLoan: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${idLoan}`);
   }
 
-  getAllPrestamos(): Observable<Prestamo[]> {
-    return this.http.get<Prestamo[]>(this.baseUrl);
+  getAllLoans(): Observable<Loan[]> {
+    return this.http.get<Loan[]>(this.baseUrl);
   }
 
   // ------------------------
@@ -71,7 +71,7 @@ export class PrestamoService {
    * Construye la URL SOLO con IDs simples
    * NUNCA meter fechas aquí
    */
-  private composeFindUrlPrestamo(
+  private composeFindUrlLoan(
     gameId?: number | null,
     clientId?: number | null
   ): string {

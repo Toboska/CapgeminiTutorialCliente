@@ -1,7 +1,7 @@
 <div class="container">
     <h1>Listado de Préstamos</h1>
 
-    <div class="filtersPrestamo">
+    <div class="filtersLoan">
         <form>
 
             <mat-form-field>
@@ -57,24 +57,24 @@
             <mat-cell *matCellDef="let element"> {{element.client.name}} </mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="fechaPrestamo">
+        <ng-container matColumnDef="loanStartDate">
             <mat-header-cell *matHeaderCellDef> Fecha de préstamo  </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.fechaPrestamo | date:'MM/dd/yyyy'}} </mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.loanStartDate | date:'dd/MM/yyyy'}} </mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="fechaDevolucion">
+        <ng-container matColumnDef="loanEndDate">
             <mat-header-cell *matHeaderCellDef> Fecha de devolucion  </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.fechaDevolucion | date:'MM/dd/yyyy'}} </mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.loanEndDate | date:'dd/MM/yyyy'}} </mat-cell>
         </ng-container>
         
 
         <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let element">
-                <button mat-icon-button color="primary" (click)="editPrestamo(element)">
+                <button mat-icon-button color="primary" (click)="editLoan(element)">
                     <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button color="accent" (click)="deletePrestamo(element)">
+                <button mat-icon-button color="accent" (click)="deleteLoan(element)">
                     <mat-icon>clear</mat-icon>
                 </button>
             </mat-cell>
@@ -87,6 +87,6 @@
     <mat-paginator (page)="loadPage($event)" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageNumber" [pageSize]="pageSize" [length]="totalElements" showFirstLastButtons></mat-paginator>
 
     <div class="buttons">
-        <button mat-flat-button color="primary" (click)="createPrestamo()">Crear préstamo</button> 
+        <button mat-flat-button color="primary" (click)="createLoan()">Crear préstamo</button> 
     </div>   
 </div>

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PrestamoEdit } from './prestamo-edit';
+import { LoanEdit } from './loan-edit';
 
-describe('PrestamoEdit', () => {
-  let component: PrestamoEdit;
-  let fixture: ComponentFixture<PrestamoEdit>;
+describe('LoanEdit', () => {
+  let component: LoanEdit;
+  let fixture: ComponentFixture<LoanEdit>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PrestamoEdit],
+      imports: [LoanEdit],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PrestamoEdit);
+    fixture = TestBed.createComponent(LoanEdit);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

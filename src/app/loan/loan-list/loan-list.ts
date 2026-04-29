@@ -10,11 +10,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_LOCALE, DateAdapter, NativeDateAdapter } from '@angular/material/core';
 
-import { PrestamoEdit } from '../prestamo-edit/prestamo-edit';
-import { PrestamoService } from '../prestamo';
-import { Prestamo } from '../model/Prestamo';
+import { LoanEdit } from '../loan-edit/loan-edit';
+import { LoanService } from '../loan';
+import { Loan } from '../model/Loan';
 import { Pageable } from '../../core/model/page/Pageable';
 import { DialogConfirmation } from '../../core/dialog-confirmation/dialog-confirmation';
 
@@ -24,7 +24,7 @@ import { GameService } from '../../game/game';
 import { ClientService } from '../../client/client';
 
 @Component({
-  selector: 'app-prestamo-list',
+  selector: 'app-loan-list',
   standalone: true,
   imports: [
     CommonModule,
@@ -40,47 +40,49 @@ import { ClientService } from '../../client/client';
     MatDatepickerModule,
     MatNativeDateModule
   ],
-  templateUrl: './prestamo-list.html',
-  styleUrl: './prestamo-list.scss',
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    { provide: DateAdapter, useClass: NativeDateAdapter }
+  ],
+  templateUrl: './loan-list.html',
+  styleUrl: './loan-list.scss',
 })
-export class PrestamoList implements OnInit {
+export class LoanList implements OnInit {
 
   games: Game[] = [];
   clients: Client[] = [];
 
+  // Filtros
   filterGame: Game | null = null;
   filterClient: Client | null = null;
   filterDate: Date | null = null;
 
+  // Paginación
   pageNumber = 0;
   pageSize = 5;
   totalElements = 0;
 
-  dataSource = new MatTableDataSource<Prestamo>();
+  dataSource = new MatTableDataSource<Loan>();
   displayedColumns: string[] = [
     'id',
     'gameTitle',
     'clientName',
-    'fechaPrestamo',
-    'fechaDevolucion',
+    'loanStartDate',
+    'loanEndDate',
     'action'
   ];
 
   constructor(
-    private prestamoService: PrestamoService,
+    private loanService: LoanService,
     private dialog: MatDialog,
     private clientService: ClientService,
     private gameService: GameService
   ) {}
 
   ngOnInit(): void {
-    this.clientService.getClients().subscribe(clients => {
-      this.clients = clients;
-    });
-
-    this.gameService.getGames().subscribe(games => {
-      this.games = games;
-    });
+    // Carga inicial de maestros para los selectores
+    this.clientService.getClients().subscribe(clients => this.clients = clients);
+    this.gameService.getGames().subscribe(games => this.games = games);
 
     this.loadPage();
   }
@@ -89,28 +91,13 @@ export class PrestamoList implements OnInit {
     this.filterGame = null;
     this.filterClient = null;
     this.filterDate = null;
+    this.pageNumber = 0; // Resetear página al limpiar
     this.loadPage();
   }
 
   onSearch(): void {
-    const pageable: Pageable = {
-      pageNumber: 0,
-      pageSize: this.pageSize,
-      sort: [{ property: 'id', direction: 'ASC' }]
-    };
-
-    const gameId = this.filterGame?.id ?? null;
-    const clientId = this.filterClient?.id ?? null;
-    const date = this.filterDate;
-    console.log(date)
-
-    this.prestamoService
-      .getPrestamos(pageable, gameId, clientId, date)
-      .subscribe(data => {
-        this.dataSource.data = data.content;
-        this.totalElements = data.totalElements;
-        this.pageNumber = data.pageable.pageNumber;
-      });
+    this.pageNumber = 0; // Siempre volver a la primera página al buscar
+    this.loadPage();
   }
 
   loadPage(event?: PageEvent): void {
@@ -120,7 +107,11 @@ export class PrestamoList implements OnInit {
       sort: [{ property: 'id', direction: 'ASC' }]
     };
 
-    this.prestamoService.getPrestamos(pageable).subscribe(data => {
+    const gameId = this.filterGame?.id ?? null;
+    const clientId = this.filterClient?.id ?? null;
+    const date = this.filterDate ?? null;
+
+    this.loanService.getLoans(pageable, gameId, clientId, date).subscribe(data => {
       this.dataSource.data = data.content;
       this.pageNumber = data.pageable.pageNumber;
       this.pageSize = data.pageable.pageSize;
@@ -128,33 +119,39 @@ export class PrestamoList implements OnInit {
     });
   }
 
-  createPrestamo(): void {
-    const dialogRef = this.dialog.open(PrestamoEdit, { data: {} });
-
-    dialogRef.afterClosed().subscribe(() => this.ngOnInit());
-  }
-
-  editPrestamo(prestamo: Prestamo): void {
-    const dialogRef = this.dialog.open(PrestamoEdit, {
-      data: { prestamo }
+  createLoan(): void {
+    const dialogRef = this.dialog.open(LoanEdit, { 
+      data: {} 
     });
 
-    dialogRef.afterClosed().subscribe(() => this.ngOnInit());
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.loadPage(); // Solo recarga si hubo cambios
+    });
   }
 
-  deletePrestamo(prestamo: Prestamo): void {
+  editLoan(loan: Loan): void {
+    const dialogRef = this.dialog.open(LoanEdit, {
+      data: { loan: loan }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // Usamos loadPage para mantener los filtros y página actual
+      this.loadPage();
+    });
+  }
+
+  deleteLoan(loan: Loan): void {
     const dialogRef = this.dialog.open(DialogConfirmation, {
       data: {
         title: 'Eliminar préstamo',
-        description:
-          'Atención: si borra el préstamo se perderán sus datos.<br>¿Desea eliminar el préstamo?'
+        description: 'Atención: si borra el préstamo se perderán sus datos.<br>¿Desea eliminar el préstamo?'
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.prestamoService.deletePrestamo(prestamo.id!).subscribe(() => {
-          this.ngOnInit();
+        this.loanService.deleteLoan(loan.id!).subscribe(() => {
+          this.loadPage();
         });
       }
     });
