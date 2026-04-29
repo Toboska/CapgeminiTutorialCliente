@@ -1,26 +1,54 @@
 <div class="container">
-    @if (client.id) {
-        <h1>Modificar cliente</h1>
-    } @else {
-        <h1>Dar de alta</h1>
-    }
 
-    <form>
-        <mat-form-field>
-            <mat-label>Identificador</mat-label>
-            <input type="text" matInput placeholder="Identificador" [(ngModel)]="client.id" name="id" disabled>
-        </mat-form-field>
+  @if (client.id) {
+    <h1>Modificar cliente</h1>
+  } @else {
+    <h1>Dar de alta</h1>
+  }
 
-        <mat-form-field>
-            <mat-label>Nombre</mat-label>
-            <input type="text" matInput placeholder="Nombre de categoría" [(ngModel)]="client.name" name="name" required>
-            <mat-error>El nombre no puede estar vacío</mat-error>
-        </mat-form-field>
-    </form>
+  <form>
 
-    <div class="buttons">
-        <button mat-stroked-button (click)="onClose()">Cerrar</button>
-        <button mat-flat-button color="primary" (click)="onSave()">Guardar</button>
-    </div>
+    <mat-form-field>
+      <mat-label>Identificador</mat-label>
+      <input
+        type="text"
+        matInput
+        placeholder="Identificador"
+        [(ngModel)]="client.id"
+        name="id"
+        disabled>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Nombre</mat-label>
+
+      <input
+        type="text"
+        matInput
+        placeholder="Nombre de cliente"
+        [(ngModel)]="client.name"
+        name="name"
+        required
+        #nameModel="ngModel"
+        (ngModelChange)="clearNameError()">
+
+      <!-- Error local: required -->
+      <mat-error *ngIf="nameModel.errors?.['required']">
+        El nombre no puede estar vacío
+      </mat-error>
+
+      <!-- Error backend -->
+      <mat-error *ngIf="nameModel.errors?.['backend']">
+        {{ nameError }}
+      </mat-error>
+
+    </mat-form-field>
+
+  </form>
+
+  <div class="buttons">
+    <button mat-stroked-button (click)="onClose()">Cerrar</button>
+    <button mat-flat-button color="primary" (click)="onSave()">Guardar</button>
+  </div>
+
 </div>
-
