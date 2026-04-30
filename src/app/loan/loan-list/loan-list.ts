@@ -54,13 +54,13 @@ export class LoanList implements OnInit {
   pageSize: number = 5;
   totalElements: number = 0;
   //Clientes
-  clients: Client [];
-  filterClient: Client;
+  clients: Client [] = null;
+  filterClient: Client = null;
   //Juegos
-  games: Game[];
-  filterGame: Game;
+  games: Game[] = null;
+  filterGame: Game = null;
   //Fecha
-  filterDate: Date;
+  filterDate: Date = null;
 
   dataSource = new MatTableDataSource<Loan>();
   displayedColumns: string[] = ['id', 'game','client','loanStartDate', 'loanEndDate', 'action'];
