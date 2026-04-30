@@ -91,9 +91,11 @@
         </mat-error>
 
       </mat-form-field>
-        <div *ngIf="errorMessage" style="color: red; margin-top: 10px;">
-            {{ errorMessage }}
-        </div>
+        
+        <mat-error *ngIf="submitted && errorMessage">
+        {{ errorMessage }}
+        </mat-error>
+
     </div>
 
     

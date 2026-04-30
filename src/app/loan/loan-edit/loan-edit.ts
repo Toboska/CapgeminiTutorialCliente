@@ -125,18 +125,18 @@ export class LoanEdit implements OnInit {
   }
 
   onLoanStartDate(date: Date | null) {
-    if (date) {
-      this.loan.loanStartDate = date;
+      if (date) {
+        this.loan.loanStartDate = this.toLocalDateString(date);
+      }
     }
-  }
 
   onLoanEndDate(date: Date | null) {
     if (date) {
-      this.loan.loanEndDate = date;
+      this.loan.loanEndDate = this.toLocalDateString(date);
     }
   }
 
-  toLocalDateString(date: Date): string {
+  private toLocalDateString(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
