@@ -46,19 +46,16 @@ export class ClientEdit implements OnInit {
 
   onSave(): void {
 
-    // ✅ 1. No permitir guardar si el campo es inválido (required, etc.)
     if (this.nameModel.invalid) {
       this.nameModel.control.markAsTouched();
       return;
     }
 
-    // ✅ 2. Limpiar solo el error backend visual
     this.nameError = undefined;
     this.removeBackendError();
 
     this.clientService.saveClient(this.client).subscribe({
       next: () => {
-        // ✅ solo cerramos si todo va bien
         this.dialogRef.close();
       },
       error: (error) => {
@@ -67,7 +64,6 @@ export class ClientEdit implements OnInit {
         if (apiError?.field === 'name') {
           this.nameError = apiError.message;
 
-          // ✅ Añadimos SOLO el error backend
           this.nameModel.control.setErrors({
             ...this.nameModel.control.errors,
             backend: true

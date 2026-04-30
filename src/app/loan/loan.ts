@@ -1,93 +1,33 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
-
+import { Observable, of } from 'rxjs';
 import { Pageable } from '../core/model/page/Pageable';
 import { Loan } from './model/Loan';
 import { LoanPage } from './model/LoanPage';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root',
 })
 export class LoanService {
+    constructor(private http: HttpClient) {}
 
-  private baseUrl = 'http://localhost:8080/loan';
+    private baseUrl = 'http://localhost:8080/loan';
 
-  constructor(private http: HttpClient) {}
-
-  getLoans(
-    pageable: Pageable,
-    gameId?: number | null,
-    clientId?: number | null,
-    date?: Date | null
-  ): Observable<LoanPage> {
-
-    let params = new HttpParams()
-      .set('page', pageable.pageNumber.toString())
-      .set('size', pageable.pageSize.toString());
-
-    if (date != null) {
-      params = params.set('date', this.toLocalDateString(date));
+    getLoans(dto: any): Observable<LoanPage> {
+        return this.http.post<LoanPage>(this.baseUrl, dto);
     }
 
-    return this.http.get<LoanPage>(
-      this.composeFindUrlLoan(gameId, clientId),
-      { params }
-    );
-  }
-
-  saveLoan(loan: Loan): Observable<Loan> {
-    const url = loan.id
-      ? `${this.baseUrl}/${loan.id}`
-      : this.baseUrl;
-
-    return this.http.put<Loan>(url, loan);
-  }
-
-  deleteLoan(idLoan: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${idLoan}`);
-  }
-
-  getAllLoans(): Observable<Loan[]> {
-    return this.http.get<Loan[]>(this.baseUrl);
-  }
-
-  // ------------------------
-  // MÉTODOS PRIVADOS
-  // ------------------------
-
-  /**
-   * Convierte Date de JS a string local yyyy-MM-dd
-   * (SIN UTC, SIN timezone, SIN desfases)
-   */
-  private toLocalDateString(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  /**
-   * Construye la URL SOLO con IDs simples
-   * NUNCA meter fechas aquí
-   */
-  private composeFindUrlLoan(
-    gameId?: number | null,
-    clientId?: number | null
-  ): string {
-
-    const params: string[] = [];
-
-    if (gameId != null) {
-      params.push(`gameId=${gameId}`);
+    saveLoan(loan: Loan): Observable<Loan> {
+        const { id } = loan;
+        const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
+        return this.http.put<Loan>(url, loan);
     }
 
-    if (clientId != null) {
-      params.push(`clientId=${clientId}`);
+    deleteLoan(idLoan: number): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${idLoan}`);
     }
 
-    return params.length > 0
-      ? `${this.baseUrl}?${params.join('&')}`
-      : this.baseUrl;
-  }
+    getAllLoans(): Observable<Loan[]> {
+        return this.http.get<Loan[]>(this.baseUrl);
+    }
 }
