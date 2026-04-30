@@ -42,7 +42,7 @@ import { GameService } from '../../game/game';
 })
 export class LoanEdit implements OnInit {
 
-  submitted: boolean = false; // ✅ inicializado correctamente
+  submitted: boolean = false; 
   loan: Loan = new Loan();
   clients: Client[] = [];
   games: Game[] = [];
@@ -55,7 +55,7 @@ export class LoanEdit implements OnInit {
     private loanService: LoanService,
     private clientService: ClientService,
     private gameService: GameService,
-    private cdr: ChangeDetectorRef // ✅ añadido
+    private cdr: ChangeDetectorRef 
   ) {}
 
   ngOnInit(): void {
@@ -94,7 +94,7 @@ export class LoanEdit implements OnInit {
     });
   }
 
-  // ✅ Guardado con detección de cambios forzada
+  
   onSave() {
     this.submitted = true;
     this.errorMessage = '';
@@ -114,7 +114,7 @@ export class LoanEdit implements OnInit {
           this.errorMessage = 'Error al guardar el préstamo';
         }
 
-        // ✅ FORZAR refresco inmediato de la UI
+        
         this.cdr.detectChanges();
       }
     });
